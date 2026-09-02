@@ -17,7 +17,6 @@
         }
         body { font-family: 'Segoe UI', system-ui, sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 20px 30px; }
         
-        /* 將最大寬度放大約 1.5 倍 (1100px -> 1650px) */
         .container { max-width: 1650px; margin: 0 auto; background: var(--card-bg); padding: 20px 30px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
         
         .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: nowrap; }
@@ -33,17 +32,16 @@
         button { padding: 6px 16px; background-color: var(--primary); color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 500; }
         button:hover { opacity: 0.9; }
         
-        /* 稍微放寬表格字體與間距 */
         table { width: 100%; border-collapse: collapse; margin-top: 10px; font-variant-numeric: tabular-nums; font-size: 14px; }
         th, td { padding: 6px 10px; text-align: left; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
         th { background-color: #f1f3f5; font-weight: 600; color: #495057; font-size: 14px;}
         
+        /* === 修正對齊邏輯：賦予固定寬度 === */
         .cell-flex { display: flex; align-items: center; gap: 10px; }
-        .stock-code { font-weight: 700; font-size: 15px; }
-        .stock-name { font-size: 13px; color: #6c757d; white-space: nowrap; }
+        .stock-code { font-weight: 700; font-size: 15px; width: 55px; flex-shrink: 0; }
+        .stock-name { font-size: 13px; color: #6c757d; width: 100px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 0; }
         
-        /* 操作按鈕隨版面稍微放大 */
-        .action-group { display: flex; align-items: center; gap: 3px; margin-left: 8px; }
+        .action-group { display: flex; align-items: center; gap: 3px; }
         .action-btn { 
             height: 22px; min-width: 22px; padding: 0 4px; font-size: 10px; 
             background-color: #adb5bd; border-radius: 4px; border: none; color: white; cursor: pointer; 
@@ -111,7 +109,7 @@
     <table id="stockTable">
         <thead>
             <tr>
-                <th width="35%">代號 / 名稱 / 操作</th>
+                <th width="35%"> </th>
                 <th width="13%">收盤價</th>
                 <th width="13%">20MA</th>
                 <th width="13%">60MA</th>
@@ -376,7 +374,7 @@
                         <div class="cell-flex">
                             <span class="color-dot color-${colorIdx}" onclick="cycleColor('${data.symbol}')" title="點擊切換分類顏色"></span>
                             <span class="stock-code">${data.symbol}</span>
-                            <span class="stock-name">${data.name}</span>
+                            <span class="stock-name" title="${data.name}">${data.name}</span>
                             <div class="action-group">
                                 <button class="action-btn" onclick="moveToTop(${index})" title="移至最上" ${isFirst ? 'disabled' : ''}>${iconToTop}</button>
                                 <button class="action-btn" onclick="moveUp(${index})" title="上移" ${isFirst ? 'disabled' : ''}>▲</button>
