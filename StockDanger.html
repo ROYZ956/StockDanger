@@ -16,7 +16,7 @@
             --tag-3: #CCDEFF80;
         }
         body { font-family: 'Segoe UI', system-ui, sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 15px; }
-        .container { max-width: 1050px; margin: 0 auto; background: var(--card-bg); padding: 15px 25px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .container { max-width: 1080px; margin: 0 auto; background: var(--card-bg); padding: 15px 25px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         
         .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: nowrap; }
         .header-left { display: flex; align-items: center; gap: 20px; }
@@ -39,7 +39,6 @@
         }
         .action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
         .delete-btn { background-color: #dc3545; margin-left: 4px; padding: 0 8px; }
-        
         .action-btn svg { display: block; }
         
         table { width: 100%; border-collapse: collapse; margin-top: 5px; font-variant-numeric: tabular-nums; font-size: 13px; }
@@ -64,10 +63,18 @@
 
         .symbol-container { display: inline-block; vertical-align: middle; }
         
-        .score-badge { padding: 4px 8px; border-radius: 4px; font-weight: 700; display: inline-block; min-width: 45px; text-align: center; }
+        /* 風險數值標籤 (加入互動與模擬特效) */
+        .score-badge { 
+            padding: 4px 8px; border-radius: 4px; font-weight: 700; display: inline-block; min-width: 45px; 
+            text-align: center; cursor: pointer; transition: transform 0.15s ease, outline 0.1s ease; 
+        }
+        .score-badge:hover { transform: scale(1.05); }
         .status-normal { background-color: var(--normal-bg); color: var(--normal-text); }
         .status-warning { background-color: var(--warning-bg); color: var(--warning-text); }
         .status-danger { background-color: var(--danger-bg); color: var(--danger-text); }
+        
+        /* 模擬漲停的淡紅色虛線外框 */
+        .sim-active { outline: 2px dashed #ff7b7b; outline-offset: 1px; }
         
         .note { color: #6c757d; font-size: 12px; white-space: nowrap; }
         .loading { text-align: center; color: #0d6efd; font-weight: bold; padding: 15px; }
@@ -101,12 +108,12 @@
         <thead>
             <tr>
                 <th width="15%">代號 / 名稱</th>
-                <th width="11%">收盤價</th>
+                <th width="14%">收盤價</th>
                 <th width="11%">20MA</th>
                 <th width="11%">60MA</th>
                 <th width="11%">120MA</th>
                 <th width="15%">風險數值</th>
-                <th width="26%">操作</th>
+                <th width="23%">操作</th>
             </tr>
         </thead>
         <tbody id="tableBody">
@@ -124,6 +131,7 @@
     document.getElementById('sentimentSelect').value = currentSentiment;
 
     let cachedMarketData = {};
+    let simulationMode = {}; 
 
     const iconToTop = `<svg width="12" height="12" viewBox="0 0 24 24"><polygon points="12,1 23,21 1,21" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/><polygon points="12,7.5 17.5,17 6.5,17" fill="currentColor"/></svg>`;
     const iconToBottom = `<svg width="12" height="12" viewBox="0 0 24 24"><polygon points="12,23 23,3 1,3" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/><polygon points="12,16.5 17.5,7 6.5,7" fill="currentColor"/></svg>`;
@@ -149,9 +157,13 @@
         drawTable();
     };
 
+    window.toggleSimulate = function(symbol) {
+        simulationMode[symbol] = !simulationMode[symbol];
+        drawTable();
+    };
+
     async function addStock() {
         const input = document.getElementById('stockInput');
-        // 加入正規表達式防呆過濾：僅允許大寫英文字母、數字與小數點，剔除其餘所有特殊符號
         let symbol = input.value.trim().toUpperCase().replace(/[^A-Z0-9.]/g, '');
 
         if (!symbol) return;
@@ -173,12 +185,12 @@
         drawTable();
     }
 
-    // 刪除邏輯改為基於絕對位置 (index) 執行，徹底避免字串跳脫字元導致的報錯
     window.removeStock = function(index) {
         const symbol = stockList[index];
         stockList.splice(index, 1);
         delete cachedMarketData[symbol];
         delete stockColors[symbol];
+        delete simulationMode[symbol];
         saveState();
         drawTable();
     };
@@ -269,9 +281,9 @@
             let ma60 = sum(closes.slice(-60)) / 60;
             let ma120 = sum(closes.slice(-120)) / 120;
 
-            return { symbol, name: stockName, price: latestPrice, ma20, ma60, ma120, error: null };
+            return { symbol, name: stockName, price: latestPrice, ma20, ma60, ma120, closes, error: null };
         } catch (error) {
-            return { symbol, name: "讀取失敗", price: 0, ma20: 0, ma60: 0, ma120: 0, error: error.message };
+            return { symbol, name: "讀取失敗", price: 0, ma20: 0, ma60: 0, ma120: 0, closes: [], error: error.message };
         }
     }
 
@@ -334,9 +346,24 @@
                 return;
             }
 
-            const score = calculateScore(data.price, data.ma20, data.ma60, data.ma120);
+            let isSimulated = simulationMode[data.symbol] || false;
+            let displayPrice = data.price;
+            let displayMa20 = data.ma20;
+            let displayMa60 = data.ma60;
+            let displayMa120 = data.ma120;
+
+            if (isSimulated && data.closes && data.closes.length >= 120) {
+                displayPrice = data.price * 1.1; 
+                let sum = (arr) => arr.reduce((a, b) => a + b, 0);
+                displayMa20 = (sum(data.closes.slice(-19)) + displayPrice) / 20;
+                displayMa60 = (sum(data.closes.slice(-59)) + displayPrice) / 60;
+                displayMa120 = (sum(data.closes.slice(-119)) + displayPrice) / 120;
+            }
+
+            const score = calculateScore(displayPrice, displayMa20, displayMa60, displayMa120);
             const scoreFormatted = score.toFixed(2);
             const statusClass = getStatusClass(score);
+            const simClass = isSimulated ? 'sim-active' : '';
 
             htmlRows += `
                 <tr class="row-color-${colorIdx}">
@@ -347,11 +374,17 @@
                             <span class="stock-name">${data.name}</span>
                         </div>
                     </td>
-                    <td><strong>${data.price.toFixed(2)}</strong></td>
-                    <td>${data.ma20.toFixed(2)}</td>
-                    <td>${data.ma60.toFixed(2)}</td>
-                    <td>${data.ma120.toFixed(2)}</td>
-                    <td><span class="score-badge ${statusClass}">${scoreFormatted}</span></td>
+                    <td><strong>${displayPrice.toFixed(2)}</strong></td>
+                    <td>${displayMa20.toFixed(2)}</td>
+                    <td>${displayMa60.toFixed(2)}</td>
+                    <td>${displayMa120.toFixed(2)}</td>
+                    <td>
+                        <span class="score-badge ${statusClass} ${simClass}" 
+                              onclick="toggleSimulate('${data.symbol}')" 
+                              title="點擊切換：模擬隔日漲停10%">
+                            ${scoreFormatted}
+                        </span>
+                    </td>
                     <td>
                         <button class="action-btn" onclick="moveToTop(${index})" title="移至最上" ${isFirst ? 'disabled' : ''}>${iconToTop}</button>
                         <button class="action-btn" onclick="moveUp(${index})" title="上移" ${isFirst ? 'disabled' : ''}>▲</button>
