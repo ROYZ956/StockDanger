@@ -47,10 +47,10 @@
             display: inline-flex; align-items: center; justify-content: center;
             white-space: nowrap; flex-shrink: 0;
         }
-        .action-btn:hover { background-color: #6c757d; }
+        .action-btn:hover:not(:disabled) { background-color: #6c757d; }
         .action-btn:disabled { opacity: 0.3; cursor: not-allowed; }
         .delete-btn { background-color: #dc3545; padding: 0 8px; margin-left: 4px; }
-        .delete-btn:hover { background-color: #bb2d3b; }
+        .delete-btn:hover:not(:disabled) { background-color: #bb2d3b; }
         .action-btn svg { display: block; width: 12px; height: 12px; }
         
         .row-color-0 { background-color: var(--tag-0); }
@@ -63,11 +63,21 @@
             border: 1.5px solid #adb5bd; cursor: pointer; flex-shrink: 0;
             transition: transform 0.1s;
         }
-        .color-dot:hover { transform: scale(1.2); }
+        .color-dot:hover:not([style*="cursor:not-allowed"]) { transform: scale(1.2); }
         .color-dot.color-0 { background-color: #fff; }
         .color-dot.color-1 { background-color: #CCF9FF; border-color: #81d4fa; }
         .color-dot.color-2 { background-color: #CCEBFF; border-color: #90caf9; }
         .color-dot.color-3 { background-color: #CCDEFF; border-color: #b39ddb; }
+
+        /* === 測試欄位輸入框樣式 === */
+        .test-input { 
+            width: 70px; padding: 2px 6px; border: 1px solid #ced4da; border-radius: 4px; 
+            font-size: 14px; font-weight: 700; text-align: left; background-color: #fff;
+            color: #212529; transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+        .test-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 2px rgba(13,110,253,.25); }
+        .test-input::-webkit-outer-spin-button, .test-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        .test-input[type=number] { -moz-appearance: textfield; }
 
         .score-group { display: flex; align-items: center; gap: 4px; white-space: nowrap; }
         .score-badge { border-radius: 4px; font-weight: 700; display: inline-block; text-align: center; }
@@ -112,7 +122,6 @@
         </div>
     </div>
 
-    <!-- 使用您微調的表格表頭，確保渲染網格穩定 -->
     <table id="stockTable">
         <thead>
             <tr>
@@ -141,10 +150,89 @@
     let cachedMarketData = {};
     let simulationMode = {}; 
 
+    // 測試區塊獨立數據模型
+    let testData = { p: 100, m20: 100, m60: 100, m120: 100 };
+    let isTestSimulated = false;
+
     const iconToTop = `<svg viewBox="0 0 24 24"><polygon points="12,1 23,21 1,21" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/><polygon points="12,7.5 17.5,17 6.5,17" fill="currentColor"/></svg>`;
     const iconToBottom = `<svg viewBox="0 0 24 24"><polygon points="12,23 23,3 1,3" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/><polygon points="12,16.5 17.5,7 6.5,7" fill="currentColor"/></svg>`;
 
     const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+    // --- 測試區塊專用邏輯 ---
+    const testScoreUI = () => {
+        let p = parseFloat(testData.p), m20 = parseFloat(testData.m20), m60 = parseFloat(testData.m60), m120 = parseFloat(testData.m120);
+        if (isNaN(p) || isNaN(m20) || isNaN(m60) || isNaN(m120) || m20 === 0 || m60 === 0 || m120 === 0) {
+            return { s: "-", cls: "status-normal" };
+        }
+        let priceToCalc = isTestSimulated ? p * 1.1 : p;
+        let score = calculateScore(priceToCalc, m20, m60, m120);
+        return { s: score.toFixed(2), cls: getStatusClass(score) };
+    };
+
+    window.calcTestScoreUI = function() {
+        let ui = testScoreUI();
+        let sm = document.getElementById('testScoreSm');
+        let md = document.getElementById('testScoreMd');
+        let lg = document.getElementById('testScoreLg');
+        
+        if (sm && md && lg) {
+            sm.innerHTML = ui.s; md.innerHTML = ui.s; lg.innerHTML = ui.s;
+            sm.className = `score-badge badge-sm ${ui.cls}`;
+            md.className = `score-badge badge-md ${ui.cls}`;
+            lg.className = `score-badge badge-lg ${ui.cls}` + (isTestSimulated ? ' sim-active' : '');
+        }
+    };
+
+    window.updateTestInput = function(field, elem) {
+        let val = parseFloat(elem.value);
+        testData[field] = isNaN(val) ? '' : val;
+        calcTestScoreUI();
+    };
+
+    window.toggleTestSimulate = function() {
+        isTestSimulated = !isTestSimulated;
+        calcTestScoreUI();
+    };
+
+    function getTestRowHTML() {
+        let t_ui = testScoreUI();
+        let simClassT = isTestSimulated ? 'sim-active' : '';
+        return `
+            <tr style="background-color: #f1f3f5; border-bottom: 2px solid #dee2e6;">
+                <td>
+                    <div class="cell-flex">
+                        <span class="color-dot color-0" style="cursor:not-allowed; opacity: 0.4;"></span>
+                        <span class="stock-code" style="color: #6c757d;">0000</span>
+                        <span class="stock-name" style="color:#495057; font-weight:600;">測試</span>
+                        <div class="action-group">
+                            <button class="action-btn" disabled style="cursor:not-allowed;" title="禁止操作">${iconToTop}</button>
+                            <button class="action-btn" disabled style="cursor:not-allowed;" title="禁止操作">▲</button>
+                            <button class="action-btn" disabled style="cursor:not-allowed;" title="禁止操作">▼</button>
+                            <button class="action-btn" disabled style="cursor:not-allowed;" title="禁止操作">${iconToBottom}</button>
+                            <button class="action-btn delete-btn" disabled style="cursor:not-allowed;" title="禁止操作">刪除</button>
+                        </div>
+                    </div>
+                </td>
+                <td><input type="number" class="test-input" value="${testData.p}" oninput="updateTestInput('p', this)" placeholder="價格"></td>
+                <td><input type="number" class="test-input" value="${testData.m20}" oninput="updateTestInput('m20', this)" placeholder="20MA"></td>
+                <td><input type="number" class="test-input" value="${testData.m60}" oninput="updateTestInput('m60', this)" placeholder="60MA"></td>
+                <td><input type="number" class="test-input" value="${testData.m120}" oninput="updateTestInput('m120', this)" placeholder="120MA"></td>
+                <td>
+                    <div class="score-group">
+                        <span id="testScoreSm" class="score-badge badge-sm ${t_ui.cls}">${t_ui.s}</span>
+                        <span id="testScoreMd" class="score-badge badge-md ${t_ui.cls}">${t_ui.s}</span>
+                        <span id="testScoreLg" class="score-badge badge-lg ${t_ui.cls} ${simClassT}" 
+                              onclick="toggleTestSimulate()" 
+                              title="點擊切換：模擬隔日漲停10%">
+                            ${t_ui.s}
+                        </span>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }
+    // --- 測試區塊專用邏輯結束 ---
 
     loadAllData();
 
@@ -157,7 +245,7 @@
     function changeSentiment() {
         currentSentiment = parseInt(document.getElementById('sentimentSelect').value);
         saveState();
-        drawTable();
+        drawTable(); // 重新渲染時也會觸發測試列跟隨情緒重算
     }
 
     window.cycleColor = function(symbol) {
@@ -181,7 +269,7 @@
         if (stockList.includes(symbol)) return alert('該股票已在清單中');
 
         input.disabled = true;
-        document.getElementById('tableBody').innerHTML = `<tr><td colspan="6" class="loading">正在抓取 ${symbol} 最新資料...</td></tr>`;
+        document.getElementById('tableBody').innerHTML = getTestRowHTML() + `<tr><td colspan="6" class="loading">正在抓取 ${symbol} 最新資料...</td></tr>`;
 
         const data = await fetchRealMarketData(symbol);
         cachedMarketData[symbol] = data;
@@ -297,13 +385,13 @@
         document.getElementById('stockCount').innerText = stockList.length;
         
         if (stockList.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#6c757d;">目前無追蹤持股，請新增股票代號。</td></tr>';
+            drawTable(); // 即使為空也呼叫 drawTable 以顯示測試列
             return;
         }
 
         for (let i = 0; i < stockList.length; i++) {
             const symbol = stockList[i];
-            tbody.innerHTML = `<tr><td colspan="6" class="loading">依序載入中，避免觸發 API 流量限制 (${i + 1}/${stockList.length}) ...</td></tr>`;
+            tbody.innerHTML = getTestRowHTML() + `<tr><td colspan="6" class="loading">依序載入中，避免觸發 API 流量限制 (${i + 1}/${stockList.length}) ...</td></tr>`;
             
             const data = await fetchRealMarketData(symbol);
             cachedMarketData[symbol] = data;
@@ -318,12 +406,14 @@
         const tbody = document.getElementById('tableBody');
         document.getElementById('stockCount').innerText = stockList.length;
 
+        let htmlRows = getTestRowHTML();
+
         if (stockList.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#6c757d;">目前無追蹤持股，請新增股票代號。</td></tr>';
+            htmlRows += '<tr><td colspan="6" style="text-align:center; color:#6c757d; padding:20px;">目前無追蹤持股，請新增股票代號。</td></tr>';
+            tbody.innerHTML = htmlRows;
             return;
         }
 
-        let htmlRows = '';
         let sum = (arr) => arr.reduce((a, b) => a + b, 0);
         let getMA = (closes, period, offset) => {
             const end = offset === 0 ? closes.length : -offset;
