@@ -15,35 +15,45 @@
             --tag-2: #CCEBFF80; 
             --tag-3: #CCDEFF80;
         }
-        body { font-family: 'Segoe UI', system-ui, sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 15px; }
-        .container { max-width: 1080px; margin: 0 auto; background: var(--card-bg); padding: 15px 25px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 20px 30px; }
         
-        .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: nowrap; }
+        /* 將最大寬度放大約 1.5 倍 (1100px -> 1650px) */
+        .container { max-width: 1650px; margin: 0 auto; background: var(--card-bg); padding: 20px 30px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
+        
+        .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: nowrap; }
         .header-left { display: flex; align-items: center; gap: 20px; }
         
-        h2 { margin: 0; color: #333; font-size: 20px; white-space: nowrap; }
+        h2 { margin: 0; color: #333; font-size: 22px; white-space: nowrap; }
         
         .input-group { display: flex; align-items: center; gap: 8px; }
-        .panel-group { display: flex; align-items: center; gap: 8px; background: #f1f3f5; padding: 6px 10px; border-radius: 6px; }
+        .panel-group { display: flex; align-items: center; gap: 8px; background: #f1f3f5; padding: 6px 12px; border-radius: 6px; }
         
-        input[type="text"] { padding: 6px 10px; border: 1px solid var(--border-color); border-radius: 4px; width: 120px; font-size: 13px; }
-        select { padding: 6px 10px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 13px; cursor: pointer; }
-        button { padding: 6px 14px; background-color: var(--primary); color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 500; }
+        input[type="text"] { padding: 6px 10px; border: 1px solid var(--border-color); border-radius: 4px; width: 130px; font-size: 14px; }
+        select { padding: 6px 10px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px; cursor: pointer; }
+        button { padding: 6px 16px; background-color: var(--primary); color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 500; }
         button:hover { opacity: 0.9; }
         
-        .action-btn { 
-            height: 24px; min-width: 24px; padding: 0 4px; font-size: 11px; margin: 0 1px; 
-            background-color: #6c757d; border-radius: 4px; border: none; color: white; cursor: pointer; 
-            display: inline-flex; align-items: center; justify-content: center;
-            vertical-align: middle; box-sizing: border-box;
-        }
-        .action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-        .delete-btn { background-color: #dc3545; margin-left: 4px; padding: 0 8px; }
-        .action-btn svg { display: block; }
+        /* 稍微放寬表格字體與間距 */
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-variant-numeric: tabular-nums; font-size: 14px; }
+        th, td { padding: 6px 10px; text-align: left; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
+        th { background-color: #f1f3f5; font-weight: 600; color: #495057; font-size: 14px;}
         
-        table { width: 100%; border-collapse: collapse; margin-top: 5px; font-variant-numeric: tabular-nums; font-size: 13px; }
-        th, td { padding: 4px 8px; text-align: left; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
-        th { background-color: #f1f3f5; font-weight: 600; color: #495057; font-size: 13px;}
+        .cell-flex { display: flex; align-items: center; gap: 10px; }
+        .stock-code { font-weight: 700; font-size: 15px; }
+        .stock-name { font-size: 13px; color: #6c757d; white-space: nowrap; }
+        
+        /* 操作按鈕隨版面稍微放大 */
+        .action-group { display: flex; align-items: center; gap: 3px; margin-left: 8px; }
+        .action-btn { 
+            height: 22px; min-width: 22px; padding: 0 4px; font-size: 10px; 
+            background-color: #adb5bd; border-radius: 4px; border: none; color: white; cursor: pointer; 
+            display: inline-flex; align-items: center; justify-content: center;
+        }
+        .action-btn:hover { background-color: #6c757d; }
+        .action-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+        .delete-btn { background-color: #dc3545; padding: 0 8px; margin-left: 4px; }
+        .delete-btn:hover { background-color: #bb2d3b; }
+        .action-btn svg { display: block; width: 12px; height: 12px; }
         
         .row-color-0 { background-color: var(--tag-0); }
         .row-color-1 { background-color: var(--tag-1); }
@@ -52,7 +62,7 @@
         
         .color-dot { 
             display: inline-block; width: 14px; height: 14px; border-radius: 50%; 
-            margin-right: 6px; border: 1.5px solid #adb5bd; vertical-align: middle; cursor: pointer;
+            border: 1.5px solid #adb5bd; cursor: pointer; flex-shrink: 0;
             transition: transform 0.1s;
         }
         .color-dot:hover { transform: scale(1.2); }
@@ -61,24 +71,18 @@
         .color-dot.color-2 { background-color: #CCEBFF; border-color: #90caf9; }
         .color-dot.color-3 { background-color: #CCDEFF; border-color: #b39ddb; }
 
-        .symbol-container { display: inline-block; vertical-align: middle; }
-        
-        /* 風險數值標籤 (加入互動與模擬特效) */
         .score-badge { 
-            padding: 4px 8px; border-radius: 4px; font-weight: 700; display: inline-block; min-width: 45px; 
-            text-align: center; cursor: pointer; transition: transform 0.15s ease, outline 0.1s ease; 
+            padding: 4px 10px; border-radius: 4px; font-weight: 700; display: inline-block; min-width: 48px; 
+            text-align: center; cursor: pointer; transition: transform 0.1s ease, outline 0.1s ease; 
         }
         .score-badge:hover { transform: scale(1.05); }
         .status-normal { background-color: var(--normal-bg); color: var(--normal-text); }
         .status-warning { background-color: var(--warning-bg); color: var(--warning-text); }
         .status-danger { background-color: var(--danger-bg); color: var(--danger-text); }
-        
-        /* 模擬漲停的淡紅色虛線外框 */
         .sim-active { outline: 2px dashed #ff7b7b; outline-offset: 1px; }
         
-        .note { color: #6c757d; font-size: 12px; white-space: nowrap; }
-        .loading { text-align: center; color: #0d6efd; font-weight: bold; padding: 15px; }
-        .stock-name { font-size: 12px; color: #6c757d; margin-top: 1px; display: block; }
+        .note { color: #6c757d; font-size: 13px; white-space: nowrap; }
+        .loading { text-align: center; color: #0d6efd; font-weight: bold; padding: 15px; font-size: 15px; }
     </style>
 </head>
 <body>
@@ -90,12 +94,12 @@
             <div class="input-group">
                 <input type="text" id="stockInput" placeholder="輸入代號 (如 3081)" onkeypress="handleEnter(event)">
                 <button onclick="addStock()">新增</button>
-                <span class="note">上限 <span id="stockCount">0</span>/10</span>
+                <span class="note">上限 <span id="stockCount">0</span>/20</span>
             </div>
         </div>
 
         <div class="panel-group">
-            <label for="sentimentSelect" style="font-size:13px; font-weight:600; color:#495057;">市場情緒 (調節係數)：</label>
+            <label for="sentimentSelect" style="font-size:14px; font-weight:600; color:#495057;">市場情緒 (調節係數)：</label>
             <select id="sentimentSelect" onchange="changeSentiment()">
                 <option value="-1">多頭樂觀</option>
                 <option value="0">半信半疑</option>
@@ -107,13 +111,12 @@
     <table id="stockTable">
         <thead>
             <tr>
-                <th width="15%">代號 / 名稱</th>
-                <th width="14%">收盤價</th>
-                <th width="11%">20MA</th>
-                <th width="11%">60MA</th>
-                <th width="11%">120MA</th>
-                <th width="15%">風險數值</th>
-                <th width="23%">操作</th>
+                <th width="35%">代號 / 名稱 / 操作</th>
+                <th width="13%">收盤價</th>
+                <th width="13%">20MA</th>
+                <th width="13%">60MA</th>
+                <th width="13%">120MA</th>
+                <th width="13%">風險數值</th>
             </tr>
         </thead>
         <tbody id="tableBody">
@@ -122,7 +125,7 @@
 </div>
 
 <script>
-    const MAX_STOCKS = 10;
+    const MAX_STOCKS = 20;
     let stockList = JSON.parse(localStorage.getItem('divergence_stocks_v8')) || [];
     let stockColors = JSON.parse(localStorage.getItem('divergence_colors_v8')) || {};
     let currentSentiment = parseInt(localStorage.getItem('divergence_sentiment_v8'));
@@ -133,8 +136,8 @@
     let cachedMarketData = {};
     let simulationMode = {}; 
 
-    const iconToTop = `<svg width="12" height="12" viewBox="0 0 24 24"><polygon points="12,1 23,21 1,21" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/><polygon points="12,7.5 17.5,17 6.5,17" fill="currentColor"/></svg>`;
-    const iconToBottom = `<svg width="12" height="12" viewBox="0 0 24 24"><polygon points="12,23 23,3 1,3" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/><polygon points="12,16.5 17.5,7 6.5,7" fill="currentColor"/></svg>`;
+    const iconToTop = `<svg viewBox="0 0 24 24"><polygon points="12,1 23,21 1,21" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/><polygon points="12,7.5 17.5,17 6.5,17" fill="currentColor"/></svg>`;
+    const iconToBottom = `<svg viewBox="0 0 24 24"><polygon points="12,23 23,3 1,3" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/><polygon points="12,16.5 17.5,7 6.5,7" fill="currentColor"/></svg>`;
 
     loadAllData();
 
@@ -167,11 +170,11 @@
         let symbol = input.value.trim().toUpperCase().replace(/[^A-Z0-9.]/g, '');
 
         if (!symbol) return;
-        if (stockList.length >= MAX_STOCKS) return alert('已達持股追蹤上限 (10檔)');
+        if (stockList.length >= MAX_STOCKS) return alert('已達持股追蹤上限 (20檔)');
         if (stockList.includes(symbol)) return alert('該股票已在清單中');
 
         input.disabled = true;
-        document.getElementById('tableBody').innerHTML = '<tr><td colspan="7" class="loading">抓取新資料中...</td></tr>';
+        document.getElementById('tableBody').innerHTML = '<tr><td colspan="6" class="loading">抓取新資料中...</td></tr>';
 
         const data = await fetchRealMarketData(symbol);
         cachedMarketData[symbol] = data;
@@ -292,11 +295,11 @@
         document.getElementById('stockCount').innerText = stockList.length;
         
         if (stockList.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#6c757d;">目前無追蹤持股，請新增股票代號。</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#6c757d;">目前無追蹤持股，請新增股票代號。</td></tr>';
             return;
         }
 
-        tbody.innerHTML = '<tr><td colspan="7" class="loading">從 FinMind 載入歷史資料與計算均線中...</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" class="loading">從 FinMind 載入歷史資料與計算均線中...</td></tr>';
 
         const promises = stockList.map(symbol => fetchRealMarketData(symbol));
         const results = await Promise.all(promises);
@@ -313,7 +316,7 @@
         document.getElementById('stockCount').innerText = stockList.length;
 
         if (stockList.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#6c757d;">目前無追蹤持股，請新增股票代號。</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#6c757d;">目前無追蹤持股，請新增股票代號。</td></tr>';
             return;
         }
 
@@ -335,13 +338,15 @@
                 htmlRows += `
                     <tr class="row-color-${colorIdx}">
                         <td>
-                            <span class="color-dot color-${colorIdx}" onclick="cycleColor('${data.symbol}')" title="點擊切換分類顏色"></span>
-                            <div class="symbol-container"><strong>${data.symbol}</strong></div>
+                            <div class="cell-flex">
+                                <span class="color-dot color-${colorIdx}" onclick="cycleColor('${data.symbol}')" title="點擊切換分類顏色"></span>
+                                <span class="stock-code">${data.symbol}</span>
+                                <div class="action-group">
+                                    <button class="action-btn delete-btn" onclick="removeStock(${index})">刪除</button>
+                                </div>
+                            </div>
                         </td>
                         <td colspan="5" style="color:#dc3545;">${data.name} (${data.error})</td>
-                        <td>
-                            <button class="action-btn delete-btn" onclick="removeStock(${index})">刪除</button>
-                        </td>
                     </tr>`;
                 return;
             }
@@ -368,10 +373,17 @@
             htmlRows += `
                 <tr class="row-color-${colorIdx}">
                     <td>
-                        <span class="color-dot color-${colorIdx}" onclick="cycleColor('${data.symbol}')" title="點擊切換分類顏色"></span>
-                        <div class="symbol-container">
-                            <strong>${data.symbol}</strong>
+                        <div class="cell-flex">
+                            <span class="color-dot color-${colorIdx}" onclick="cycleColor('${data.symbol}')" title="點擊切換分類顏色"></span>
+                            <span class="stock-code">${data.symbol}</span>
                             <span class="stock-name">${data.name}</span>
+                            <div class="action-group">
+                                <button class="action-btn" onclick="moveToTop(${index})" title="移至最上" ${isFirst ? 'disabled' : ''}>${iconToTop}</button>
+                                <button class="action-btn" onclick="moveUp(${index})" title="上移" ${isFirst ? 'disabled' : ''}>▲</button>
+                                <button class="action-btn" onclick="moveDown(${index})" title="下移" ${isLast ? 'disabled' : ''}>▼</button>
+                                <button class="action-btn" onclick="moveToBottom(${index})" title="移至最下" ${isLast ? 'disabled' : ''}>${iconToBottom}</button>
+                                <button class="action-btn delete-btn" onclick="removeStock(${index})">刪除</button>
+                            </div>
                         </div>
                     </td>
                     <td><strong>${displayPrice.toFixed(2)}</strong></td>
@@ -384,13 +396,6 @@
                               title="點擊切換：模擬隔日漲停10%">
                             ${scoreFormatted}
                         </span>
-                    </td>
-                    <td>
-                        <button class="action-btn" onclick="moveToTop(${index})" title="移至最上" ${isFirst ? 'disabled' : ''}>${iconToTop}</button>
-                        <button class="action-btn" onclick="moveUp(${index})" title="上移" ${isFirst ? 'disabled' : ''}>▲</button>
-                        <button class="action-btn" onclick="moveDown(${index})" title="下移" ${isLast ? 'disabled' : ''}>▼</button>
-                        <button class="action-btn" onclick="moveToBottom(${index})" title="移至最下" ${isLast ? 'disabled' : ''}>${iconToBottom}</button>
-                        <button class="action-btn delete-btn" onclick="removeStock(${index})">刪除</button>
                     </td>
                 </tr>
             `;
